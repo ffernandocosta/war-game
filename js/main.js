@@ -28,6 +28,9 @@ drawCardBtn.addEventListener("click", () => {
             const winnerText = determineCardWinner(data.cards[0], data.cards[1])
             header.textContent = winnerText
             remainingCardsEL.textContent = `Remaining cards: ${data.remaining}`
+            if (data.remaining === 0) {
+                drawCardBtn.disabled = true
+            }
         })
 })
 
