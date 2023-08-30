@@ -9,43 +9,41 @@ const computerScore = document.getElementById("computer-score")
 const myScore = document.getElementById("my-score")
 const header = document.getElementById("header")
 
-function handleClick() {
-    fetch("https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/")
-        .then(res => res.json())
-        .then(data => {
-            deckId = data.deck_id
-            remainingCardsEL.textContent = `Remaining cards: ${data.remaining}`
-        })
+async function handleNewDeckClick() {
+    const res = await fetch("https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/")
+    const data = res.json()
+    deckId = data.deck_id
+    remainingCardsEL.textContent = `Remaining cards: ${data.remaining}`
+
 }
 
-newDeckBtn.addEventListener("click", handleClick)
+newDeckBtn.addEventListener("click", handleNewDeckClick)
 
-drawCardBtn.addEventListener("click", () => {
-    fetch(`https://apis.scrimba.com/deckofcards/api/deck/${deckId}/draw/?count=2`)
-        .then(res => res.json())
-        .then(data => {
-            cardsContainer.children[0].innerHTML = `
-                <img src=${data.cards[0].image} class="card" />
-            `
-            cardsContainer.children[1].innerHTML = `
-                <img src=${data.cards[1].image} class="card" />
-            `
-            const winnerText = determineCardWinner(data.cards[0], data.cards[1])
-            header.textContent = winnerText
-            remainingCardsEL.textContent = `Remaining cards: ${data.remaining}`
-            if (data.remaining === 0) {
-                drawCardBtn.disabled = true
-                if (computerScoreCount > myScoreCount) {
-                    header.textContent = "The computer won the game!"
-                }
-                else if (computerScoreCount < myScoreCount) {
-                    header.textContent = "You won the game!"
-                }
-                else {
-                    header.textContent = "It's a tie game!"
-                }
-            }
-        })
+drawCardBtn.addEventListener("click", async () => {
+    const res = await fetch(`https://apis.scrimba.com/deckofcards/api/deck/${deckId}/draw/?count=2`)
+    const data = await res.json()
+    
+    cardsContainer.children[0].innerHTML = `
+        <img src=${data.cards[0].image} class="card" />
+    `
+    cardsContainer.children[1].innerHTML = `
+        <img src=${data.cards[1].image} class="card" />
+    `
+    const winnerText = determineCardWinner(data.cards[0], data.cards[1])
+    header.textContent = winnerText
+    remainingCardsEL.textContent = `Remaining cards: ${data.remaining}`
+    if (data.remaining === 0) {
+        drawCardBtn.disabled = true
+        if (computerScoreCount > myScoreCount) {
+            header.textContent = "The computer won the game!"
+        }
+        else if (computerScoreCount < myScoreCount) {
+            header.textContent = "You won the game!"
+        }
+        else {
+            header.textContent = "It's a tie game!"
+        }
+    }
 })
 
 function determineCardWinner(card1, card2) {
